@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="8cec46b5-338d-4039-88cd-0e8ee9fb0325" name="Changes" comment="update">
+      <change beforePath="$PROJECT_DIR$/eva_hwdb_with_gt_box.py" beforeDir="false" afterPath="$PROJECT_DIR$/eval_hwdb_with_gt_box.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/eval_hwdb_with_center_line.py" beforeDir="false" afterPath="$PROJECT_DIR$/eval_hwdb_with_center_line.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/connect_layer_new_one_batch_hwdb.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/connect_layer.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/det/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/det/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/det/pannet.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/det/pannet.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/model_with_TCN_big_new_one_batch_hwdb.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/model_with_tcn_big.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/train_with_hwdb2.py" beforeDir="false" afterPath="$PROJECT_DIR$/train_with_hwdb2.py" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectId" id="1yYxja5Pd6vEqF5AD8PQgstPy96" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+    <ConfirmationsSetting value="1" id="Add" />
+  </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/utils" />
+    <property name="node.js.detected.package.eslint" value="true" />
+    <property name="node.js.detected.package.tslint" value="true" />
+    <property name="node.js.selected.package.eslint" value="(autodetect)" />
+    <property name="node.js.selected.package.tslint" value="(autodetect)" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\Workspace\github\Offline-Chinese-Handwriting-Text-Page-Spotter-with-Text-Kernel\utils" />
+    </key>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="8cec46b5-338d-4039-88cd-0e8ee9fb0325" name="Changes" comment="" />
+      <created>1632442461802</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1632442461802</updated>
+      <workItem from="1632442464012" duration="2891000" />
+      <workItem from="1632491190001" duration="1710000" />
+      <workItem from="1632493011796" duration="6954000" />
+      <workItem from="1632570340459" duration="10271000" />
+    </task>
+    <task id="LOCAL-00001" summary="update">
+      <created>1632581324172</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1632581324172</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="oldMeFiltersMigrated" value="true" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="update" />
+    <option name="LAST_COMMIT_MESSAGE" value="update" />
+  </component>
+</project>
