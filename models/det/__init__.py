@@ -1,1 +1,0 @@
-from .pannet import Model as PANnet
