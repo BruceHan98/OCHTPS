@@ -16,13 +16,11 @@ def ctc_loss(criterion, prediction_chars, labels, label_lengths, sub_img_nums, c
         # print(prediction_char.shape)
         # print(label_length)
 
-        input_length = torch.full(size=(len(prediction_char),), fill_value=prediction_char.shape[1],
-                                  dtype=torch.long).to(
-            prediction_char.device)
+        input_length = torch.full(size=(len(prediction_char),), fill_value=prediction_char.shape[1], dtype=torch.long).to(prediction_char.device)
         prediction_char = prediction_char.log_softmax(-1)
         prediction_char = prediction_char.permute(1, 0, 2)
 
-        torch.backends.cudnn.enabled = False
+        torch.backends.cudnn.enabled = False  # 使用非确定性算法优化运行效率
         # print(prediction_char.shape,label_length)
 
         cost_char = criterion(prediction_char, label, input_length, label_length)
@@ -32,14 +30,10 @@ def ctc_loss(criterion, prediction_chars, labels, label_lengths, sub_img_nums, c
         if torch.isnan(cost_char):
             print(prediction_char)
             print(label.shape)
-
             raise
         prediction_char = prediction_char.permute(1, 0, 2)
-        if is_print:
-            acc = ctc_acc(char_set, prediction_char, label, label_length, blank=0, p=True, bean_search=False)
-            # print(acc)
-        else:
-            acc = ctc_acc(char_set, prediction_char, label, label_length, blank=0, p=False, bean_search=False)
+
+        acc = ctc_acc(char_set, prediction_char, label, label_length, blank=0, p=is_print, bean_search=False)
         CR_correct_chars, AR_correct_chars, all_chars = acc[1]
         a_CR_correct_chars += CR_correct_chars
         a_AR_correct_chars += AR_correct_chars
@@ -54,10 +48,10 @@ def remove_blank(labels, blank=0):
 
     # combine duplicate
     previous = None
-    for l in labels:
-        if l != previous:
-            new_labels.append(l)
-            previous = l
+    for label in labels:
+        if label != previous:
+            new_labels.append(label)
+            previous = label
 
     # remove blank
     new_labels = [l for l in new_labels if l != blank]
@@ -90,7 +84,7 @@ def beam_decode_lite(y, beam_size=10):
     top5 = partition_arg_topK(-y, beam_size, 1)
 
     beam = [([], 0)]
-    for t in range(T):  # for every timestep
+    for t in range(T):  # for every time step
         new_beam = []
         for prefix, score in beam:
             for i in range(beam_size):  # for every state
@@ -177,10 +171,9 @@ def ctc_acc(char_set, preds, labels, label_length, blank=0, p=True, bean_search=
         AR_correct_chars += AR_correct_char
 
         all_chars += max(len(label_str), len(pred_str))
-        # all_chars+=len(label_str)
+
         if p:
             pred = preds[i]
-
             print(label_str, AR_correct_char / max(len(label_str), len(pred_str), 1),
                   CR_correct_char / max(len(label_str), len(pred_str), 1))
             if bean_search:
@@ -188,9 +181,9 @@ def ctc_acc(char_set, preds, labels, label_length, blank=0, p=True, bean_search=
                 for bean, score in beans:
                     bean = remove_blank(bean)
                     bean_str = ''
-                    for strii in bean:
+                    for s in bean:
                         try:
-                            bean_str += char_set[strii]
+                            bean_str += char_set[s]
                         except:
                             pass
                     sub_label_pred.append([bean_str, score])
@@ -199,6 +192,7 @@ def ctc_acc(char_set, preds, labels, label_length, blank=0, p=True, bean_search=
             else:
                 print(pred_str)
             print()
+
     return correct_words / labels.shape[0], [CR_correct_chars, AR_correct_chars, all_chars], label_pred
 
 
