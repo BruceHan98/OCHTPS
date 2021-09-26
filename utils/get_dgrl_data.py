@@ -12,13 +12,13 @@ def get_pred_data(file_paths, width=1600):
         with open(file_path, 'rb') as f:
             header_size = np.fromfile(f, dtype='uint32', count=1)[0]
             header = np.fromfile(f, dtype='uint8', count=header_size - 4)
-            formatcode = "".join([chr(c) for c in header[:8]])
+            format_code = "".join([chr(c) for c in header[:8]])
             Illustration_size = header_size - 36
             Illustration = "".join([chr(c) for c in header[8:Illustration_size + 8]])
             Code_type = "".join([chr(c) for c in header[Illustration_size + 8:Illustration_size + 28]])
             Code_length = header[Illustration_size + 28] + header[Illustration_size + 29] << 4
             Bits_per_pixel = header[Illustration_size + 30] + header[Illustration_size + 31] << 4
-            # print(header_size, formatcode, Illustration)
+            # print(header_size, format_code, Illustration)
             # print(Code_type, Code_length, Bits_per_pixel)
             # print()
             Image_height = np.fromfile(f, dtype='uint32', count=1)[0]
@@ -161,7 +161,7 @@ def get_pred_data(file_paths, width=1600):
         h, w, _ = img_np.shape
         short_edge = max(h, w)
         if short_edge > width:
-            # 保证短边 >= inputsize
+            # 保证短边 >= input size
             scale = width / short_edge
             img_np = cv2.resize(img_np, dsize=None, fx=scale, fy=scale)
             boxes *= scale

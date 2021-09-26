@@ -18,13 +18,13 @@ def get_dgrl_data(file_path, char_dict, is_train=True):
     with open(file_path, 'rb') as f:
         header_size = np.fromfile(f, dtype='uint32', count=1)[0]
         header = np.fromfile(f, dtype='uint8', count=header_size - 4)
-        formatcode = "".join([chr(c) for c in header[:8]])
+        format_code = "".join([chr(c) for c in header[:8]])
         Illustration_size = header_size - 36
         Illustration = "".join([chr(c) for c in header[8:Illustration_size + 8]])
         Code_type = "".join([chr(c) for c in header[Illustration_size + 8:Illustration_size + 28]])
         Code_length = header[Illustration_size + 28] + header[Illustration_size + 29] << 4
         Bits_per_pixel = header[Illustration_size + 30] + header[Illustration_size + 31] << 4
-        # print(header_size, formatcode, Illustration)
+        # print(header_size, format_code, Illustration)
         # print(Code_type, Code_length, Bits_per_pixel)
         # print()
         Image_height = np.fromfile(f, dtype='uint32', count=1)[0]
@@ -165,10 +165,6 @@ def check_shrinked_poly(box):
 def generate_rbox(im_size, text_polys, text_labels, training_mask, i, n, m):
     """
     生成mask图，白色部分是文本，黑色是北京
-    :param im_size: 图像的h,w
-    :param text_polys: 框的坐标
-    :param text_tags: 标注文本框是否参与训练
-    :return: 生成的mask图
     """
     h, w = im_size
     score_map = np.zeros((h, w), dtype=np.uint8)
@@ -341,8 +337,8 @@ def image_label(img_np, text_polys, text_label, text_length, n: int, m: float, i
 
 
 class MyDataset(data.Dataset):
-    def __init__(self, data_dirs, char_dict, data_shape: int = 640, n=6, m=0.5, transform=None, target_transform=None, max_text_length=80,
-                 is_train=True):
+    def __init__(self, data_dirs, char_dict, data_shape: int = 640, n=6, m=0.5,
+                 transform=None, target_transform=None, max_text_length=80, is_train=True):
         self.char_dict = char_dict
         self.data_shape = data_shape
         self.transform = transform
@@ -357,10 +353,8 @@ class MyDataset(data.Dataset):
         # print(self.image_list[index])
         dgrl_path = self.dgrl_list[index]
         img_np, text_polys, label_tensor, text_length = get_dgrl_data(dgrl_path, self.char_dict, self.is_train)
-        img, score_maps, training_mask, text_polys, label_tensors, text_lengths = image_label(img_np, text_polys, label_tensor, text_length,
-                                                                                              input_size=self.data_shape,
-                                                                                              n=self.n,
-                                                                                              m=self.m, is_train=self.is_train)
+        img, score_maps, training_mask, text_polys, label_tensors, text_lengths = \
+            image_label(img_np, text_polys, label_tensor, text_length, input_size=self.data_shape, n=self.n, m=self.m, is_train=self.is_train)
         # img = draw_bbox(img,text_polys)
         if self.transform:
             img = self.transform(img)
@@ -419,7 +413,6 @@ class MyDataset(data.Dataset):
 
 
 class AlignCollate(object):
-
     def __call__(self, batch):
         batch = filter(lambda x: x is not None, batch)
 
@@ -454,13 +447,8 @@ if __name__ == '__main__':
 
     train_data = MyDataset(
         [
-            # 'D:/git/OCR/handwritind_dect_reco/data/hwdb2/img_test',
             'D:/git/OCR/handwritind_dect_reco/data/hwdb2/HWDB2.0Test',
             # 'D:/git/OCR/handwritind_dect_reco/data/hwdb2/HWDB2.0Train',
-            # 'D:/git/OCR/handwritind_dect_reco/data/hwdb2/HWDB2.1Test',
-            # 'D:/git/OCR/handwritind_dect_reco/data/hwdb2/HWDB2.1Train',
-            # 'D:/git/OCR/handwritind_dect_reco/data/hwdb2/HWDB2.2Test',
-            # 'D:/git/OCR/handwritind_dect_reco/data/hwdb2/HWDB2.2Train',
         ],
         data_shape=1600, n=2, m=0.5,
         transform=transforms.ToTensor(), max_text_length=80, is_train=True)
