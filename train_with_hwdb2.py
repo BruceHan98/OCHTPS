@@ -158,8 +158,8 @@ if __name__ == '__main__':
     # pre_dict = torch.load(
     #     './output/with_tcn_big_icdar/model_new1_epoch_13_loss_char_all_0.3923_loss_kernel_all_0.1185_AR_0.911840_CR_0.920156.pth')
 
-    # # pre_dict.pop('DenseNet_layer.classifier.weight')
-    # # pre_dict.pop('DenseNet_layer.classifier.bias')
+    # pre_dict.pop('DenseNet_layer.classifier.weight')
+    # pre_dict.pop('DenseNet_layer.classifier.bias')
     # model_dict = model.state_dict()
     # pre_dict = {k: v for k, v in pre_dict.items() if k in model_dict}
 

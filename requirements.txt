@@ -1,0 +1,6 @@
+pyclipper
+opencv-python==4.5.1.48
+scikit-image
+torch
+torchvision
+tqdm

@@ -1,10 +1,7 @@
 import difflib
-
+import numpy as np
 import torch
 from skimage.draw import polygon
-
-# from dataset.hwdb1_chars_dict import char_set
-import numpy as np
 
 
 def remove_blank(labels, blank=0):
