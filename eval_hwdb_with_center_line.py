@@ -18,6 +18,7 @@ def predict(model, pred_iter):
         img_np, img_tensor, boxes, page_label = next(pred_iter)
         boxes = boxes[0]
         imgs = img_tensor.to(device)
+        # print(imgs.shape)
 
         kernel, out_chars, sub_img_nums, line_top_lefts, line_contours = model(imgs, None, is_train=False)
 
@@ -25,6 +26,8 @@ def predict(model, pred_iter):
         prediction_char = out_chars
         prediction_char = prediction_char.log_softmax(-1)
         pred_strs = get_pred_str(prediction_char, char_set)
+        print(pred_strs)
+        print(page_label)
 
         pred_str_group = ['' for _ in range(len(page_label))]
         not_in_char = ''
@@ -37,7 +40,6 @@ def predict(model, pred_iter):
             pred_str_poly = np.squeeze(pred_str_poly, 1)
             find_flag = 0
             for label_i in range(len(boxes)):
-
                 label_box = boxes[label_i] / 4
                 pred_iou = polygon_IOU(pred_str_poly, label_box)
                 if pred_iou > 0.9:
@@ -70,7 +72,7 @@ def predict(model, pred_iter):
 
 
 if __name__ == '__main__':
-    device = torch.device('cuda')
+    device = torch.device('cpu')
     img_transform = transforms.ToTensor()
     model = Model(num_classes=3000, line_height=32, is_transformer=True, is_TCN=True).to(device)
     model.load_state_dict(torch.load('./output/model.pth', map_location=device))
