@@ -146,9 +146,7 @@ class DenseNet(nn.Module):
         else:
             english_flag = 0
 
-        self.features = nn.Sequential(OrderedDict([
-            ('conv0', nn.Conv2d(num_init_features, num_init_features, kernel_size=3, stride=2, padding=1, bias=False)),
-        ]))
+        self.features = nn.Sequential(OrderedDict([('conv0', nn.Conv2d(num_init_features, num_init_features, kernel_size=3, stride=2, padding=1, bias=False))]))
         self.features.add_module('norm0', nn.BatchNorm2d(num_init_features))
         self.features.add_module('relu0', nn.ReLU(inplace=True))
 
@@ -218,7 +216,7 @@ if __name__ == '__main__':
 
     model = DenseNet(num_classes=2704).to(device)
 
-    print("modules have {} paramerters in total".format(sum(x.numel() for x in model.parameters())))
+    print("modules have {} parameters in total".format(sum(x.numel() for x in model.parameters())))
 
     from torchsummary import summary
 

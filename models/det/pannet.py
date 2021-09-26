@@ -68,7 +68,7 @@ if __name__ == '__main__':
         'segmentation_head': 'FPEM_FFM'  # 分割头，FPN or FPEM_FFM
     }
     model = PANNet(model_config=model_config).to(device)
-    print("{} paramerters in total".format(sum(x.numel() for x in model.parameters())))
+    print("{} parameters in total".format(sum(x.numel() for x in model.parameters())))
     y, feature = model(x)
     print(y.shape)
     print(feature.shape)

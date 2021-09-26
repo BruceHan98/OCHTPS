@@ -33,10 +33,8 @@ class Connect(nn.Module):
             sub_text_kernel_features = []
             max_text_kernel_length = 64
             for batch_size_i in range(len(features)):
-
                 feature = features[batch_size_i]
                 sub_img_nums.append(len(gt_boxes[batch_size_i]))
-
                 _, H, W = feature.shape
                 for gt_box in gt_boxes[batch_size_i]:
                     # print(gt_box)
@@ -93,12 +91,9 @@ class Connect(nn.Module):
                         # trans_box[:,  0] = np.clip(trans_box[:, 0], 0, W - 1)
                         # trans_box[:,  1] = np.clip(trans_box[:, 1], 0, H - 1)
 
-                        sub_text_kernel_feature = perspective(feature, origin_box, trans_box)[:, :int(gt_box_h),
-                                                  :int(gt_box_w)]
+                        sub_text_kernel_feature = perspective(feature, origin_box, trans_box)[:, :int(gt_box_h), :int(gt_box_w)]
                         if is_train:
-
-                            interpolate_w = int(
-                                sub_text_kernel_feature.shape[-1] * trans_h / gt_box_h * random.uniform(0.8, 1.2)) + 2
+                            interpolate_w = int(sub_text_kernel_feature.shape[-1] * trans_h / gt_box_h * random.uniform(0.8, 1.2)) + 2
                         else:
                             interpolate_w = int(sub_text_kernel_feature.shape[-1] * trans_h / gt_box_h)
 
@@ -112,13 +107,10 @@ class Connect(nn.Module):
                     # text_kernel_features_length.append(interpolate_w // 4)
                     sub_text_kernel_features.append(torch.squeeze(sub_text_kernel_feature, 0))
             text_kernel_tensor_features = torch.zeros(
-                (
-                    sum(sub_img_nums), sub_text_kernel_features[0].shape[0], self.Line_Height,
-                    max_text_kernel_length + 32),
+                (sum(sub_img_nums), sub_text_kernel_features[0].shape[0], self.Line_Height, max_text_kernel_length + 32),
                 dtype=features[0].dtype, device=features[0].device)
             for sub_i, sub_text_kernel_tensor_feature in enumerate(sub_text_kernel_features):
-                text_kernel_tensor_features[sub_i, :, :,
-                16:sub_text_kernel_tensor_feature.shape[-1] + 16] = sub_text_kernel_tensor_feature
+                text_kernel_tensor_features[sub_i, :, :, 16:sub_text_kernel_tensor_feature.shape[-1] + 16] = sub_text_kernel_tensor_feature
             return text_kernel_tensor_features, sub_img_nums
         else:
             max_text_kernel_length = 0
@@ -151,13 +143,10 @@ class Connect(nn.Module):
                         approx = cv2.approxPolyDP(contour, max(trans_heights) * 0.2, True)
                         sub_line_contour.append(approx)
                         try:
-                            sub_line_trans = trans_line(trans_points, trans_widths, trans_heights, feature, self.tps,
-                                                        self.Line_Height)
+                            sub_line_trans = trans_line(trans_points, trans_widths, trans_heights, feature, self.tps, self.Line_Height)
 
                         except:
-                            sub_line_trans = torch.zeros((1, 512, self.Line_Height, self.Line_Height),
-                                                         dtype=feature.dtype,
-                                                         device=feature.device)
+                            sub_line_trans = torch.zeros((1, 512, self.Line_Height, self.Line_Height), dtype=feature.dtype, device=feature.device)
 
                         line_trans_list.append(sub_line_trans)
                         max_text_kernel_length = max(max_text_kernel_length, sub_line_trans.shape[3])
@@ -175,8 +164,7 @@ class Connect(nn.Module):
                 line_top_lefts.append(line_top_left)
                 line_contours.append(sub_line_contour)
             text_kernel_tensor_features = torch.zeros(
-                (sum(sub_img_nums), line_trans_list[0].shape[1], self.Line_Height, max_text_kernel_length + 32),
-                dtype=features[0].dtype, device=features[0].device)
+                (sum(sub_img_nums), line_trans_list[0].shape[1], self.Line_Height, max_text_kernel_length + 32), dtype=features[0].dtype, device=features[0].device)
             for sub_i, sub_line_trans in enumerate(line_trans_list):
                 # print(text_kernel_tensor_features.shape,sub_line_trans.shape)
                 text_kernel_tensor_features[sub_i, :, :, 16:sub_line_trans.shape[-1] + 16] = sub_line_trans
@@ -190,14 +178,14 @@ class TPS(torch.nn.Module):
         super().__init__()
 
     def forward(self, X, Y, w, h):
-        """ 计算grid"""
+        """计算grid"""
         device = X.device
         grid = torch.ones(1, h, w, 2, device=device)
         grid[:, :, :, 0] = torch.linspace(-1, 1, w)
         grid[:, :, :, 1] = torch.linspace(-1, 1, h)[..., None]
         grid = grid.view(-1, h * w, 2)
 
-        """ 计算W, A"""
+        """计算W, A"""
         n, k = X.shape[:2]
         device = X.device
 
@@ -260,12 +248,7 @@ def trans_line(kernel_points, box_widths, box_heights, feature, tps, out_height)
 
     line_feature = feature[:, margin_y:margin_y + margin_h, margin_x:margin_x + margin_w].clone()
     if int(sum(box_widths) - margin_w) > 0:
-        line_feature = torch.dstack([line_feature,
-                                     torch.zeros((line_feature.shape[0],
-                                                  line_feature.shape[1],
-                                                  int(sum(box_widths) - margin_w)),
-                                                 dtype=line_feature.dtype,
-                                                 device=line_feature.device)])
+        line_feature = torch.dstack([line_feature, torch.zeros((line_feature.shape[0], line_feature.shape[1], int(sum(box_widths) - margin_w)), dtype=line_feature.dtype, device=line_feature.device)])
 
     kernel_points[:, :, 0] -= margin_x
     kernel_points[:, :, 1] -= margin_y
@@ -294,10 +277,9 @@ def trans_line(kernel_points, box_widths, box_heights, feature, tps, out_height)
     point_target = point_norm(point_target, line_w, line_h, device=feature.device)
     warped_grid = tps(point_target[None, ...], point_source[None, ...], line_w, line_h)  # 这个输入的位置需要归一化，所以用norm
 
-    ten_wrp = F.grid_sample(line_feature[None, ...], warped_grid, mode='bilinear', padding_mode='zeros',
-                            align_corners=True)
+    ten_wrp = F.grid_sample(line_feature[None, ...], warped_grid, mode='bilinear', padding_mode='zeros', align_corners=True)
 
-    max_marign = int((margin_h - max_box_height) / 2)
+    max_margin = int((margin_h - max_box_height) / 2)
     ten_wrp = ten_wrp[:, :, :max_box_height, :]
     size_h = out_height
     size_w = int(line_w * out_height / max_box_height * 1)
@@ -419,7 +401,7 @@ def get_center_points(contour):
         pad_x_max = min(int(circle_x + 4 * min_height), raw_dist.shape[1])
         raw_dist[pad_y_min:pad_y_max, pad_x_min:pad_x_max] = 0
         minVal, maxVal, _, maxDistPt = cv2.minMaxLoc(raw_dist)
-        #
+
         # cv2.imshow('raw_dist', kernel_big)
         # cv2.waitKey()
     if len(center_points) == 1:

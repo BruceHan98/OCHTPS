@@ -65,4 +65,3 @@ class Decoder(nn.Module):
     def forward(self, input):
         output = self.decode(input)
         return output
-
