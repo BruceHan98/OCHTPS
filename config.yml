@@ -13,3 +13,4 @@ lr: 0.0001
 # print
 display_interval: 20
 print_pred: 200
+pretrained_model: './output/model.pth'

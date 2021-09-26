@@ -1,7 +1,9 @@
-import cv2
+import os
+from tqdm import tqdm
 import numpy as np
-import torch
 from PIL import Image, ImageDraw, ImageFont
+import cv2
+import torch
 from torchvision import transforms
 
 from models.model_with_tcn_big import Model
@@ -68,26 +70,18 @@ def predict(model, pred_iter, show=False):
 
 
 if __name__ == '__main__':
-    from tqdm import tqdm
-    import os
-
     device = torch.device('cuda')
     img_transform = transforms.ToTensor()
 
     model = Model(num_classes=3000, line_height=32, is_transformer=True, is_TCN=True).to(device)
-    model.load_state_dict(torch.load(
-        r'./output/hwdb2'
-        r'/model.pth'))
-
+    model.load_state_dict(torch.load('./output/model.pth'))
     model.eval()
 
+    test_file_dir = '../dgrl_test'
     file_paths = []
-    for root_path in [r'D:\git\OCR\handwritind_dect_reco\data/hwdb2/HWDB2.0Test/dgrl',
-                      r'D:\git\OCR\handwritind_dect_reco\data/hwdb2/HWDB2.1Test/dgrl',
-                      r'D:\git\OCR\handwritind_dect_reco\data/hwdb2/HWDB2.2Test/dgrl']:
-        for file_path in os.listdir(root_path):
-            if file_path.endswith('dgrl'):
-                file_paths.append(os.path.join(root_path, file_path))
+    for file_path in os.listdir(test_file_dir):
+        if file_path.endswith('dgrl'):
+            file_paths.append(os.path.join(test_file_dir, file_path))
 
     CR_all, AR_all, All_all = 0, 0, 0
     edit_d_a, char_c_a = 0, 0

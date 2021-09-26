@@ -1,13 +1,13 @@
-import torch
+import os
+from tqdm import tqdm
 import numpy as np
-from utils.hwdb2_0_chars import char_set
+import torch
 from torchvision import transforms
+
+from models.model_with_tcn_big import Model
+from utils.hwdb2_0_chars import char_set
 from utils.get_dgrl_data import get_pred_data
 from utils.pred_utils import get_ar_cr, get_pred_str, polygon_IOU, normal_leven
-from models.model_with_tcn_big import Model
-
-from tqdm import tqdm
-import os
 
 
 def predict(model, pred_iter):
@@ -67,22 +67,17 @@ def predict(model, pred_iter):
 
 
 if __name__ == '__main__':
-
     device = torch.device('cuda')
     img_transform = transforms.ToTensor()
     model = Model(num_classes=3000, line_height=32, is_transformer=True, is_TCN=True).to(device)
-    model.load_state_dict(torch.load(
-        r'./output/hwdb2'
-        r'/model.pth'))
+    model.load_state_dict(torch.load('./output/model.pth'))
     model.eval()
-    file_paths = []
 
-    for root_path in [r'./data/hwdb2/HWDB2.0Test/dgrl',
-                      r'./data/hwdb2/HWDB2.1Test/dgrl',
-                      r'./data/hwdb2/HWDB2.2Test/dgrl']:
-        for file_path in os.listdir(root_path):
-            if file_path.endswith('dgrl'):
-                file_paths.append(os.path.join(root_path, file_path))
+    test_file_dir = '../dgrl_test'
+    file_paths = []
+    for file_path in os.listdir(test_file_dir):
+        if file_path.endswith('dgrl'):
+            file_paths.append(os.path.join(test_file_dir, file_path))
 
     CR_all, AR_all, All_all = 0, 0, 0
     EDIT_DISTANCE_ALL, CHAR_COUNT_ALL = 0, 0
@@ -105,7 +100,7 @@ if __name__ == '__main__':
         Recall = TP_all / (TP_all + FN_all)
         F1 = 2 / (1 / Precision + 1 / Recall)
 
-        pbar.display('CR:{:.6f} AR:{:.6f} edid_d:{:.6f} Precision:{:.6f} Recall:{:.6f} F1:{:.6f}\n'.format(
+        pbar.display('CR:{:.6f} AR:{:.6f} edit_d:{:.6f} Precision:{:.6f} Recall:{:.6f} F1:{:.6f}\n'.format(
             CR_all / All_all, AR_all / All_all, (CHAR_COUNT_ALL - EDIT_DISTANCE_ALL) / CHAR_COUNT_ALL,
             Precision, Recall, F1))
         pbar.update(1)

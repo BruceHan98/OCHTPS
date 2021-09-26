@@ -20,6 +20,7 @@ class Config:
         self.lr = config['lr']
         self.display_interval = config['display_interval']
         self.print_pred = config['print_pred']
+        self.pretrained_model = config['pretrained_model']
 
     def list_all_member(self):
         for name, value in vars(self).items():
