@@ -8,7 +8,7 @@ class Config:
 
     def _get_config(self):
         with open(self.config_path, "r") as setting:
-            config = yaml.load(setting)
+            config = yaml.load(setting, Loader=yaml.FullLoader)
         self.train_data_dir = config['train_data_dir']
         self.eval_data_dir = config['eval_data_dir']
         self.train_batch_size = config['train_batch_size']

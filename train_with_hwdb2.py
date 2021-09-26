@@ -24,9 +24,9 @@ train_dataset = MyDataset(config.train_data_dir, char_dict, data_shape=1600, n=2
 eval_dataset = MyDataset(config.eval_data_dir, char_dict, data_shape=1600, n=2, m=0.6, transform=transforms.ToTensor(), max_text_length=80, is_train=False)
 train_dataloader = DataLoader(dataset=train_dataset, collate_fn=AlignCollate(), batch_size=config.train_batch_size, shuffle=True, num_workers=config.num_workers, pin_memory=False)
 eval_dataloader = DataLoader(dataset=eval_dataset, collate_fn=AlignCollate(), batch_size=config.eval_batch_size, shuffle=True, num_workers=config.num_workers, pin_memory=False)
-train_iters = len(train_dataloader)
-eval_iters = len(eval_dataloader)
-print("Training steps: %d, evaluation steps: %d" % (train_iters, eval_iters))
+train_steps = len(train_dataloader)
+eval_steps = len(eval_dataloader)
+print("Training steps: %d, evaluation steps: %d" % (train_steps, eval_steps))
 
 model = Model(num_classes=config.num_classes, line_height=config.line_height, is_transformer=True, is_TCN=True).to(device)
 
@@ -47,7 +47,7 @@ def train():
         loss_char_all = 0
         loss_kernel_all = 0
     
-        for train_iter in range(train_iters):
+        for train_step in range(train_steps):
             imgs, kernel_labels, text_polys, label_tensors, text_lengths = next(train_iter)
             # torch.cuda.empty_cache()
             imgs = imgs.to(device)
@@ -56,7 +56,7 @@ def train():
                 kernels_pred, out_chars, sub_img_nums = model(imgs, text_polys, is_train=True)
                 loss_kernel = criterion_kernel(kernels_pred, kernel_labels)
     
-                if (train_iter + 1) % config.print_pred == 0:
+                if (train_step + 1) % config.print_pred == 0:
                     is_print = True
                 else:
                     is_print = False
@@ -64,10 +64,10 @@ def train():
                 a_CR_correct_chars += CR_correct_chars
                 a_AR_correct_chars += AR_correct_chars
                 a_all_chars += all_chars
-                loss_char_all += loss_char.item
-                loss_kernel_all += loss_kernel.item
+                loss_char_all += loss_char.item()
+                loss_kernel_all += loss_kernel.item()
     
-                if loss_kernel.item > 0.13:
+                if loss_kernel.item() > 0.13:
                     loss = 0.1 * loss_kernel + loss_char
                 else:
                     loss = loss_char
@@ -83,15 +83,15 @@ def train():
             AR = a_AR_correct_chars / (a_all_chars + 1)
             CR = a_CR_correct_chars / (a_all_chars + 1)
     
-            if (train_iter + 1) % config.display_interval == 0:
+            if (train_step + 1) % config.display_interval == 0:
                 torch.cuda.empty_cache()
                 logger.info("train epoch: %d, iters: %4d/%4d, loss_char_all: %.6f, loss_char: %.4f,"
                             " loss_kernel_all: %.6f, loss_kernel: %.4f, AR: %.4f, CR: %.4f, AR_all: %.4f, CR_all: %.4f"
-                            % (epoch, train_iter, train_iters, loss_char_all/(train_iter+1), loss_char.item,
-                               loss_kernel_all/(train_iter+1), loss_kernel.item, AR_correct_chars/all_chars, CR_correct_chars/all_chars, AR, CR, ))
+                            % (epoch+1, train_step+1, train_steps, loss_char_all/(train_step+1), loss_char.item(),
+                               loss_kernel_all/(train_step+1), loss_kernel.item(), AR_correct_chars/all_chars, CR_correct_chars/all_chars, AR, CR, ))
 
         logger.info('train epoch:{} loss_kernel:{:.4f} loss_char:{:.4f} AR:{:.4f} CR:{:.4f}\n'.format(
-            epoch, loss_kernel_all / (train_iters + 1), loss_char_all / (train_iters + 1), a_AR_correct_chars / a_all_chars, a_CR_correct_chars / a_all_chars))
+            epoch, loss_kernel_all / (train_steps + 1), loss_char_all / (train_steps + 1), a_AR_correct_chars / a_all_chars, a_CR_correct_chars / a_all_chars))
         
         evaluate(epoch)
 
@@ -106,7 +106,7 @@ def evaluate(epoch, is_save=True):
     edit_distance = []
 
     with torch.no_grad():
-        for eval_step in range(eval_iters):
+        for eval_step in range(eval_steps):
             imgs, kernel_labels, text_polys, label_tensors, text_lengths = next(eval_iter)
             # torch.cuda.empty_cache()
             imgs = imgs.to(device)
@@ -125,9 +125,9 @@ def evaluate(epoch, is_save=True):
             a_CR_correct_chars += CR_correct_chars
             a_AR_correct_chars += AR_correct_chars
             a_all_chars += all_chars
-            loss_all += 0.0 * loss_kernel.item + loss_char.item
-            loss_char_all += loss_char.item
-            loss_kernel_all += loss_kernel.item
+            loss_all += 0.0 * loss_kernel.item() + loss_char.item()
+            loss_char_all += loss_char.item()
+            loss_kernel_all += loss_kernel.item()
 
             AR = a_AR_correct_chars / (a_all_chars + 1)
             CR = a_CR_correct_chars / (a_all_chars + 1)
@@ -135,8 +135,8 @@ def evaluate(epoch, is_save=True):
             if (eval_step + 1) % config.display_interval == 0:
                 logger.info("eval epoch: %d, iters: %4d/%4d, loss_char_all: %.6f, loss_char: %.4f,"
                             " loss_kernel_all: %.6f, loss_kernel: %.4f, AR: %.4f, CR: %.4f, AR_all: %.4f, CR_all: %.4f"
-                            % (epoch, eval_step, eval_iters, loss_char_all/(eval_iter+1), loss_char.item,
-                               loss_kernel_all/(eval_iter+1), loss_kernel.item, AR_correct_chars/all_chars, CR_correct_chars/all_chars, AR, CR, ))
+                            % (epoch+1, eval_step+1, eval_steps, loss_char_all/(eval_step+1), loss_char.item(),
+                               loss_kernel_all/(eval_step+1), loss_kernel.item(), AR_correct_chars/all_chars, CR_correct_chars/all_chars, AR, CR, ))
 
     AR = a_AR_correct_chars / (a_all_chars + 1)
     CR = a_CR_correct_chars / (a_all_chars + 1)
@@ -146,9 +146,9 @@ def evaluate(epoch, is_save=True):
         if CR > max_CR:
             max_CR = CR
             torch.save(model.state_dict(), './output/model_epoch_{}_loss_char_all_{:.4f}_loss_kernel_all_{:.4f}_AR_{:.6f}_CR_{:.6f}.pth'.format(
-                epoch, loss_char_all / (eval_iters + 1), loss_kernel_all / (eval_iters + 1), AR, CR))
+                epoch, loss_char_all / (eval_steps + 1), loss_kernel_all / (eval_steps + 1), AR, CR))
     logger.info('eval epoch:{} loss_kernel:{:.4f} loss_char:{:.4f} AR:{:.4f} CR:{:.4f}\n'.format(
-        epoch, loss_kernel_all / (eval_iters + 1), loss_char_all / (eval_iters + 1), a_AR_correct_chars / a_all_chars, a_CR_correct_chars / a_all_chars))
+        epoch, loss_kernel_all / (eval_steps + 1), loss_char_all / (eval_steps + 1), a_AR_correct_chars / a_all_chars, a_CR_correct_chars / a_all_chars))
 
 
 if __name__ == '__main__':

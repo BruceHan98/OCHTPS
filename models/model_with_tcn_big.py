@@ -12,7 +12,7 @@ class Model(nn.Module):
         PANNet_config = {
             'backbone': 'resnet34',
             'fpem_repeat': 4,  # fpem 模块重复的次数
-            'pretrained': True,  # backbone 是否使用 imagenet 的预训练模型
+            'pretrained': False,  # backbone 是否使用 imagenet 的预训练模型
             'result_num': 7,
             'segmentation_head': 'FPEM_FFM'  # 分割头，FPN or FPEM_FFM
         }

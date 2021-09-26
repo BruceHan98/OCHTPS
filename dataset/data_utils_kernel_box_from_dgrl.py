@@ -6,6 +6,7 @@ import struct
 import cv2
 import numpy as np
 import pyclipper
+import torch
 from torch.utils import data
 
 from dataset.augment import DataAugment
