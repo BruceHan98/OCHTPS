@@ -15,7 +15,7 @@ import warnings
 warnings.filterwarnings("ignore", category=UserWarning)
 
 
-def predict(model, pred_iter, show=False):
+def predict(model, pred_iter, file_path, show=False):
     with torch.no_grad():
         img_np, img_tensor, boxes, page_label = next(pred_iter)
         label_np = np.ones_like(img_np, dtype=np.uint8) * 255
@@ -59,25 +59,34 @@ def predict(model, pred_iter, show=False):
 
             label_np = cv2.cvtColor(np.asarray(label_np), cv2.COLOR_RGB2BGR)
 
-            # show_np = np.hstack([img_np, label_np])
-            # show_np = cv2.resize(show_np, None, fx=0.7, fy=0.7)
-            if img_np.shape[1] > 1600:
-                scale = 1600 / img_np.shape[1]
-                img_np = cv2.resize(img_np, None, fx=scale, fy=scale)
-                label_np = cv2.resize(label_np, None, fx=scale, fy=scale)
+            show_np = np.hstack([img_np, label_np])
+            show_np = cv2.resize(show_np, None, fx=0.7, fy=0.7)
 
-            cv2.imshow('1', img_np)
-            cv2.imshow('label', label_np)
-            cv2.waitKey()
+            # if img_np.shape[1] > 1600:
+            #     scale = 1600 / img_np.shape[1]
+            #     img_np = cv2.resize(img_np, None, fx=scale, fy=scale)
+            #     label_np = cv2.resize(label_np, None, fx=scale, fy=scale)
+            # cv2.imshow('1', img_np)
+            # cv2.imshow('label', label_np)
+            # cv2.waitKey()
+
+            (path, filename) = os.path.split(file_path)
+            save_name = filename.split('.')[0] + '.jpg'
+            save_dir = './output/result'
+            save_path = os.path.join(save_dir, save_name)
+            if not os.path.exists:
+                os.makedirs(save_dir)
+            cv2.imwrite(save_path, show_np)
+
     return CR, AR, All, edit_d, char_c
 
 
 if __name__ == '__main__':
-    device = torch.device('cuda')
+    device = torch.device('cpu')
     img_transform = transforms.ToTensor()
 
     model = Model(num_classes=3000, line_height=32, is_transformer=True, is_TCN=True).to(device)
-    model.load_state_dict(torch.load('./output/model.pth'))
+    model.load_state_dict(torch.load('./output/model.pth', map_location=torch.device('cpu')))
     model.eval()
 
     test_file_dir = '../dgrl_test'
@@ -93,7 +102,7 @@ if __name__ == '__main__':
     pred_iter = iter(get_pred_data(file_paths, 1600))
 
     for i in range(len(file_paths)):
-        cr, ar, all, edit_d, char_c = predict(model, pred_iter, False)
+        cr, ar, all, edit_d, char_c = predict(model, pred_iter, file_paths[i], True)
         CR_all += cr
         AR_all += ar
         All_all += all
