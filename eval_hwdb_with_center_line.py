@@ -9,6 +9,9 @@ from utils.hwdb2_0_chars import char_set
 from utils.get_dgrl_data import get_pred_data
 from utils.pred_utils import get_ar_cr, get_pred_str, polygon_IOU, normal_leven
 
+import warnings
+warnings.filterwarnings("ignore", category=UserWarning)
+
 
 def predict(model, pred_iter):
     with torch.no_grad():

@@ -14,6 +14,9 @@ from dataset.hwdb2_0_chars import char_dict, char_set
 from utils.logger import logger
 from utils.config import Config
 
+import warnings
+warnings.filterwarnings("ignore", category=UserWarning)
+
 scaler = GradScaler()
 torch.multiprocessing.set_sharing_strategy('file_system')  # 设置共享CPU张量的策略
 device = torch.device('cuda')
