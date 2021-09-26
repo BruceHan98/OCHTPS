@@ -133,3 +133,5 @@ def polygon_IOU(polygon_1, polygon_2):
     if union == 0:
         return 0
     intersection = np.sum(canvas == 2)
+
+    return intersection

@@ -74,7 +74,7 @@ def predict(model, pred_iter, file_path, show=False):
             save_name = filename.split('.')[0] + '.jpg'
             save_dir = './output/result'
             save_path = os.path.join(save_dir, save_name)
-            if not os.path.exists:
+            if not os.path.exists(save_dir):
                 os.makedirs(save_dir)
             cv2.imwrite(save_path, show_np)
 
@@ -82,11 +82,11 @@ def predict(model, pred_iter, file_path, show=False):
 
 
 if __name__ == '__main__':
-    device = torch.device('cpu')
+    device = torch.device('cuda')
     img_transform = transforms.ToTensor()
 
     model = Model(num_classes=3000, line_height=32, is_transformer=True, is_TCN=True).to(device)
-    model.load_state_dict(torch.load('./output/model.pth', map_location=torch.device('cpu')))
+    model.load_state_dict(torch.load('./output/model.pth', map_location=device))
     model.eval()
 
     test_file_dir = '../dgrl_test'

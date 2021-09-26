@@ -73,7 +73,7 @@ if __name__ == '__main__':
     device = torch.device('cuda')
     img_transform = transforms.ToTensor()
     model = Model(num_classes=3000, line_height=32, is_transformer=True, is_TCN=True).to(device)
-    model.load_state_dict(torch.load('./output/model.pth'))
+    model.load_state_dict(torch.load('./output/model.pth', map_location=device))
     model.eval()
 
     test_file_dir = '../dgrl_test'
