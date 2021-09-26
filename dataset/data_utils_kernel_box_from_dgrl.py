@@ -51,8 +51,7 @@ def get_dgrl_data(file_path, char_dict, is_train=True):
             Height = np.fromfile(f, dtype='uint32', count=1)[0]
             Width = np.fromfile(f, dtype='uint32', count=1)[0]
             Bitmap = np.fromfile(f, dtype='uint8', count=Height * Width).reshape([Height, Width])
-            contours, hierarchy = cv2.findContours(
-                255 - Bitmap, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+            contours, hierarchy = cv2.findContours(255 - Bitmap, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
             if random.random() < 0.2 and is_train:
                 all_margin += Height * 0.3
             elif not is_train:

@@ -1,6 +1,8 @@
 import os
 from tqdm import tqdm
 import numpy as np
+from PIL import Image, ImageDraw, ImageFont
+import cv2
 import torch
 from torchvision import transforms
 
@@ -13,21 +15,20 @@ import warnings
 warnings.filterwarnings("ignore", category=UserWarning)
 
 
-def predict(model, pred_iter):
+def predict(model, pred_iter, file_path, show=False):
     with torch.no_grad():
         img_np, img_tensor, boxes, page_label = next(pred_iter)
+        label_np = np.ones_like(img_np, dtype=np.uint8) * 255
         boxes = boxes[0]
         imgs = img_tensor.to(device)
-        # print(imgs.shape)
+        print(imgs.shape)
 
         kernel, out_chars, sub_img_nums, line_top_lefts, line_contours = model(imgs, None, is_train=False)
-
         line_contours = line_contours[0]
+
         prediction_char = out_chars
         prediction_char = prediction_char.log_softmax(-1)
         pred_strs = get_pred_str(prediction_char, char_set)
-        print(pred_strs)
-        print(page_label)
 
         pred_str_group = ['' for _ in range(len(page_label))]
         not_in_char = ''
@@ -68,11 +69,45 @@ def predict(model, pred_iter):
             All += sub_all
         AR -= len(not_in_char)
 
+        if show:
+            line_contours = list(map(lambda x: x*4, line_contours))
+            for box in line_contours:
+                box = np.int_(box)
+                cv2.polylines(img_np, [box], True, 128, 1)
+            char_size = int(label_np.shape[1] / len(page_label) / 5)
+            if isinstance(label_np, np.ndarray):
+                label_np = Image.fromarray(cv2.cvtColor(label_np, cv2.COLOR_BGR2RGB))
+            draw = ImageDraw.Draw(label_np)
+
+            fontText = ImageFont.truetype('simfang.ttf', char_size, encoding="utf-8")
+            draw.text((0, 0), 'CR:{:.6f} AR:{:.6f}'.format(CR / All, AR / All), (0, 0, 0), font=fontText)
+            for i in range(len(pred_str_group)):
+                left = boxes[i][0][0]
+                top = boxes[i][0][1]
+                draw.text((left, top), 'label:' + page_label[i], (0, 0, 0), font=fontText)
+                draw.text((left, top + char_size), 'preds:' + pred_str_group[i], (0, 0, 0), font=fontText)
+
+            label_np = cv2.cvtColor(np.asarray(label_np), cv2.COLOR_RGB2BGR)
+
+            show_np = np.hstack([img_np, label_np])
+            show_np = cv2.resize(show_np, None, fx=0.7, fy=0.7)
+
+            print("labels:", page_label)
+            print("predicts:", pred_str_group)
+            # cv2.drawContours(img_np, line_contours, -1, (0, 0, 255), 1)
+            (path, filename) = os.path.split(file_path)
+            save_name = filename.split('.')[0] + '_cl.jpg'
+            save_dir = './output/result'
+            save_path = os.path.join(save_dir, save_name)
+            if not os.path.exists(save_dir):
+                os.makedirs(save_dir)
+            cv2.imwrite(save_path, show_np)
+
     return CR, AR, All, edit_d, char_c, TP, FP, FN
 
 
 if __name__ == '__main__':
-    device = torch.device('cpu')
+    device = torch.device('cuda')
     img_transform = transforms.ToTensor()
     model = Model(num_classes=3000, line_height=32, is_transformer=True, is_TCN=True).to(device)
     model.load_state_dict(torch.load('./output/model.pth', map_location=device))
@@ -91,7 +126,7 @@ if __name__ == '__main__':
     pred_iter = iter(get_pred_data(file_paths, 1600))
 
     for i in range(len(file_paths)):
-        cr, ar, all, edit_d, char_c, TP, FP, FN = predict(model, pred_iter)
+        cr, ar, all, edit_d, char_c, TP, FP, FN = predict(model, pred_iter, file_paths[i], False)
         CR_all += cr
         AR_all += ar
         All_all += all

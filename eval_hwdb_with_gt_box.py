@@ -71,7 +71,7 @@ def predict(model, pred_iter, file_path, show=False):
             # cv2.waitKey()
 
             (path, filename) = os.path.split(file_path)
-            save_name = filename.split('.')[0] + '.jpg'
+            save_name = filename.split('.')[0] + '_gt.jpg'
             save_dir = './output/result'
             save_path = os.path.join(save_dir, save_name)
             if not os.path.exists(save_dir):
@@ -102,7 +102,7 @@ if __name__ == '__main__':
     pred_iter = iter(get_pred_data(file_paths, 1600))
 
     for i in range(len(file_paths)):
-        cr, ar, all, edit_d, char_c = predict(model, pred_iter, file_paths[i], True)
+        cr, ar, all, edit_d, char_c = predict(model, pred_iter, file_paths[i], False)
         CR_all += cr
         AR_all += ar
         All_all += all
