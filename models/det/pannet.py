@@ -23,10 +23,10 @@ segmentation_head_dict = {'FPN': FPN, 'FPEM_FFM': FPEM_FFM}
 # 'shufflenetv2': {'models': shufflenet_v2_x1_0, 'out': [24, 116, 232, 464]}}
 
 
-class Model(nn.Module):
+class PANNet(nn.Module):
     def __init__(self, model_config: dict):
         """
-        PANnet
+        PANNet
         :param model_config: 模型配置
         """
         super().__init__()
@@ -67,7 +67,7 @@ if __name__ == '__main__':
         'result_num': 7,
         'segmentation_head': 'FPEM_FFM'  # 分割头，FPN or FPEM_FFM
     }
-    model = Model(model_config=model_config).to(device)
+    model = PANNet(model_config=model_config).to(device)
     print("{} paramerters in total".format(sum(x.numel() for x in model.parameters())))
     y, feature = model(x)
     print(y.shape)

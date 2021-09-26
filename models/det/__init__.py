@@ -1,1 +1,1 @@
-from .pannet import Model as PANNet
+from .pannet import PANNet

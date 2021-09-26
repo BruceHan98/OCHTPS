@@ -12,15 +12,13 @@ class Model(nn.Module):
         PANNet_config = {
             'backbone': 'resnet34',
             'fpem_repeat': 4,  # fpem 模块重复的次数
-            'pretrained': False,  # backbone 是否使用 imagenet 的预训练模型
+            'pretrained': True,  # backbone 是否使用 imagenet 的预训练模型
             'result_num': 7,
             'segmentation_head': 'FPEM_FFM'  # 分割头，FPN or FPEM_FFM
         }
         self.PAN_layer = PANNet(model_config=PANNet_config)
         self.Connect_layer = Connect(line_height)
-        self.DenseNet_layer = DenseNet_with_TCN_big(num_classes=num_classes, is_english=is_english,
-                                                    is_TCN=is_TCN,
-                                                    is_transformer=is_transformer)
+        self.DenseNet_layer = DenseNet_with_TCN_big(num_classes=num_classes, is_english=is_english, is_TCN=is_TCN, is_transformer=is_transformer)
 
     def forward(self, img_tensors, gt_boxes=None, is_train=True):
         assert (is_train == True and gt_boxes is not None) or is_train == False
