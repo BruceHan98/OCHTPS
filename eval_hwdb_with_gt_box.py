@@ -102,7 +102,7 @@ if __name__ == '__main__':
     pred_iter = iter(get_pred_data(file_paths, 1600))
 
     for i in range(len(file_paths)):
-        cr, ar, all, edit_d, char_c = predict(model, pred_iter, file_paths[i], False)
+        cr, ar, all, edit_d, char_c = predict(model, pred_iter, file_paths[i], True)
         CR_all += cr
         AR_all += ar
         All_all += all

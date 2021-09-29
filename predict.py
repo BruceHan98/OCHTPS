@@ -43,7 +43,7 @@ def predict_from_image(image_path):
         cv2.drawContours(image_np, line_contours, -1, (0, 0, 255), 2)
         cv2.imwrite('result.jpg', image_np)
 
-        #         print(line_contours)
+        # print(line_contours)
         print(pred_strs)
 
 

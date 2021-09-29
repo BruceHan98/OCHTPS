@@ -21,7 +21,6 @@ def predict(model, pred_iter, file_path, show=False):
         label_np = np.ones_like(img_np, dtype=np.uint8) * 255
         boxes = boxes[0]
         imgs = img_tensor.to(device)
-        print(imgs.shape)
 
         kernel, out_chars, sub_img_nums, line_top_lefts, line_contours = model(imgs, None, is_train=False)
         line_contours = line_contours[0]
@@ -29,6 +28,8 @@ def predict(model, pred_iter, file_path, show=False):
         prediction_char = out_chars
         prediction_char = prediction_char.log_softmax(-1)
         pred_strs = get_pred_str(prediction_char, char_set)
+
+        print(pred_strs)
 
         pred_str_group = ['' for _ in range(len(page_label))]
         not_in_char = ''
@@ -126,7 +127,7 @@ if __name__ == '__main__':
     pred_iter = iter(get_pred_data(file_paths, 1600))
 
     for i in range(len(file_paths)):
-        cr, ar, all, edit_d, char_c, TP, FP, FN = predict(model, pred_iter, file_paths[i], False)
+        cr, ar, all, edit_d, char_c, TP, FP, FN = predict(model, pred_iter, file_paths[i], True)
         CR_all += cr
         AR_all += ar
         All_all += all
